@@ -1,27 +1,19 @@
-package com.level.up.proyecto.spring.demo.model;
+package com.level.up.proyecto.spring.demo.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "productos")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Producto {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ProductoCrearDTO {
 
     @NotBlank(message = "El código del producto es requerido")
     @Size(max = 50, message = "El código no puede exceder 50 caracteres")
-    @Column(unique = true)
     private String codigo;
 
     @NotBlank(message = "La categoría es requerida")
@@ -45,23 +37,16 @@ public class Producto {
     @Size(max = 500, message = "La descripción corta no puede exceder 500 caracteres")
     private String descripcion;
 
-    @Column(length = 2000)
     @Size(max = 2000, message = "La descripción del producto no puede exceder 2000 caracteres")
     private String descripcionProducto;
 
-    @Builder.Default
-    private Boolean oferta = false;
+    private Boolean oferta;
 
-    @Column(length = 2000)
     @Size(max = 2000, message = "Las especificaciones no pueden exceder 2000 caracteres")
     private String especificaciones;
 
-    @Column(name = "stock")
     @PositiveOrZero(message = "El stock debe ser mayor o igual a 0")
-    @Builder.Default
-    private Integer stock = 0;
+    private Integer stock;
 
-    @Column(name = "activo")
-    @Builder.Default
-    private Boolean activo = true;
+    private Boolean activo;
 }

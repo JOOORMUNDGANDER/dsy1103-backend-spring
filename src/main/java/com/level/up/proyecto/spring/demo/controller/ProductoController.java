@@ -2,11 +2,12 @@ package com.level.up.proyecto.spring.demo.controller;
 
 import com.level.up.proyecto.spring.demo.model.Producto;
 import com.level.up.proyecto.spring.demo.service.ProductoService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -18,59 +19,71 @@ public class ProductoController {
         this.productoService = productoService;
     }
 
-    // GET: Todos los productos
+    // GET: Obtener todos los productos
     @GetMapping
-    public List<Producto> getAllProductos() {
-        return productoService.getAll();
+    public ResponseEntity<List<Producto>> obtenerTodos() {
+        return ResponseEntity.ok(productoService.obtenerTodos());
     }
 
-    // GET: Producto por ID
+    // GET: Obtener producto por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> getProductoById(@PathVariable Long id) {
-        Optional<Producto> producto = productoService.getById(id);
-        return producto.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(productoService.obtenerPorId(id));
     }
 
-    // POST: Crear nuevo producto completo
+    // GET: Obtener productos por categoría
+    @GetMapping("/categoria/{categoria}")
+    public ResponseEntity<List<Producto>> obtenerPorCategoria(@PathVariable String categoria) {
+        return ResponseEntity.ok(productoService.obtenerPorCategoria(categoria));
+    }
+
+    // GET: Obtener productos en oferta
+    @GetMapping("/ofertas")
+    public ResponseEntity<List<Producto>> obtenerEnOferta() {
+        return ResponseEntity.ok(productoService.obtenerEnOferta());
+    }
+
+    // GET: Buscar productos por nombre
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Producto>> buscarPorNombre(@RequestParam String nombre) {
+        return ResponseEntity.ok(productoService.buscarPorNombre(nombre));
+    }
+
+    // GET: Buscar productos por rango de precios
+    @GetMapping("/precio")
+    public ResponseEntity<List<Producto>> buscarPorRangoPrecio(
+            @RequestParam Double min,
+            @RequestParam Double max) {
+        return ResponseEntity.ok(productoService.buscarPorRangoPrecio(min, max));
+    }
+
+    // POST: Crear nuevo producto
     @PostMapping
-    public Producto createProducto(@RequestBody Producto producto) {
-        return productoService.save(producto);
+    public ResponseEntity<Producto> crear(@Valid @RequestBody Producto producto) {
+        Producto nuevoProducto = productoService.crear(producto);
+        return new ResponseEntity<>(nuevoProducto, HttpStatus.CREATED);
     }
 
-    // PUT: Actualizar todos los datos de un producto (excepto id)
+    // PUT: Actualizar producto completo
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProducto(@PathVariable Long id, @RequestBody Producto nuevoProducto) {
-        Optional<Producto> productoActual = productoService.getById(id);
-        if (productoActual.isPresent()) {
-            Producto producto = productoActual.get();
-            producto.setCodigo(nuevoProducto.getCodigo());
-            producto.setCategoria(nuevoProducto.getCategoria());
-            producto.setNombre(nuevoProducto.getNombre());
-            producto.setPrecio(nuevoProducto.getPrecio());
-            producto.setPrecioOriginal(nuevoProducto.getPrecioOriginal());
-            producto.setImagen(nuevoProducto.getImagen());
-            producto.setDescripcion(nuevoProducto.getDescripcion());
-            producto.setDescripcionProducto(nuevoProducto.getDescripcionProducto());
-            producto.setOferta(nuevoProducto.getOferta());
-            producto.setEspecificaciones(nuevoProducto.getEspecificaciones());
-
-            Producto actualizado = productoService.save(producto);
-            return ResponseEntity.ok(actualizado);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Producto> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody Producto producto) {
+        return ResponseEntity.ok(productoService.actualizar(id, producto));
     }
 
-    // DELETE: Eliminar producto por id
+    // PATCH: Actualizar producto parcialmente
+    @PatchMapping("/{id}")
+    public ResponseEntity<Producto> actualizarParcial(
+            @PathVariable Long id,
+            @RequestBody Producto producto) {
+        return ResponseEntity.ok(productoService.actualizarParcial(id, producto));
+    }
+
+    // DELETE: Eliminar producto
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProducto(@PathVariable Long id) {
-        Optional<Producto> producto = productoService.getById(id);
-        if (producto.isPresent()) {
-            productoService.delete(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        productoService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
