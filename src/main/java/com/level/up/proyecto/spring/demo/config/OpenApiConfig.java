@@ -17,7 +17,7 @@ import java.util.List;
 @Configuration
 public class OpenApiConfig {
 
-    @Value("${server.port:8081}")
+    @Value("${server.port:8085}")
     private String serverPort;
 
     @Bean
@@ -39,7 +39,7 @@ public class OpenApiConfig {
                                 .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:" + serverPort)
+                                .url("http://3.131.93.189:" + serverPort)
                                 .description("Servidor de desarrollo")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
